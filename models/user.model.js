@@ -30,6 +30,10 @@ const userSchema = mongoose.Schema(
       min: [8, "Password must be 8 characters or more"],
       required: [true, "Password is required"],
     },
+    profileImage: {
+      type: String, // Cloudinary URL
+      required: true,
+    },
   },
   { timestamps: true }
 );
