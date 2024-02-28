@@ -63,4 +63,26 @@ const updateBlog = async (req, res) => {
   res.status(200).json({ message: "Blog Updated Successfully" });
 };
 
-module.exports = { uploadBlog, getAllBlogs, getUserBlogs, updateBlog };
+const deleteBlog = async (req, res) => {
+  const blog = await Blog.findOne({ _id: req.params.id });
+
+  if (blog.user.toString() !== req.user._id.toString()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (!blog) {
+    return res.status(400).json({ message: "No Blog Found" });
+  }
+
+  await Blog.deleteOne({ id: req.params.id });
+
+  res.status(200).json({ message: "Blog Deleted Successfully" });
+};
+
+module.exports = {
+  uploadBlog,
+  getAllBlogs,
+  getUserBlogs,
+  updateBlog,
+  deleteBlog,
+};
