@@ -1,27 +1,51 @@
 const Blog = require("../models/blog.model");
 
 const uploadBlog = async (req, res) => {
-  const { title, content } = req.body;
+  try {
+    const { title, content, category } = req.body;
 
-  if (!title || !content) {
-    return res.status(400).json({ message: "Missing Details for Blogs" });
+    if (!title || !content || !category) {
+      return res.status(400).json({ message: "Missing Details for Blogs" });
+    }
+
+    const blog = await Blog.create({
+      title: title,
+      content: content,
+      category: category,
+      user: req.user._id,
+    });
+
+    if (!blog) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    res.status(200).json({ message: "Blog Uploaded Successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Check all the details" });
   }
-
-  const blog = await Blog.create({
-    title: title,
-    content: content,
-    user: req.user._id,
-  });
-
-  if (!blog) {
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
-  res.status(200).json({ message: "Blog Uploaded Successfully" });
 };
 
 const getAllBlogs = async (req, res) => {
-  const blogs = await Blog.find({});
+  const { category, sort } = req.query;
+
+  const queryObject = {};
+
+  if (category) {
+    queryObject.category = category;
+  }
+
+  // FIND DATA USING QUERY OBJECT AND OPTIONS
+
+  apiData = Blog.find(queryObject);
+
+  // DATA SORTING FUNCTIONALLITY
+  if (sort) {
+    let sortFix = sort.replace(",", " ");
+    apiData = await apiData.sort(sortFix);
+  }
+
+  const blogs = await apiData;
+
   if (!blogs) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
